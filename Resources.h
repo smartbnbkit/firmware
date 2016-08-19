@@ -1,0 +1,195 @@
+const char Resource_Index[] PROGMEM = R"RES(<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SmartBnbKit WiFi configuration</title>
+        <style type="text/css">
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                background-color: #f3f3f4;
+                font-family: "open sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+                font-size: 13px;
+                color: #676a6c;
+                overflow-x: hidden;
+                height: 100%;
+                line-height: 1.42857143;
+                margin: 0;
+            }
+            .middle-box {
+                max-width: 400px;
+                z-index: 100;
+                margin: 0 auto;
+                padding-top: 40px;
+                width: 300px;
+                text-align: center;
+            }
+            .m-t {
+                margin-top: 15px;
+            }
+            form {
+                display: block;
+                margin-top: 0em;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            .form-control {
+                background-color: #FFFFFF;
+                background-image: none;
+                border: 1px solid #e5e6e7;
+                border-radius: 1px;
+                color: inherit;
+                display: block;
+                padding: 6px 12px;
+                transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+                width: 100%;
+                font-size: 14px;
+                line-height: 1.42857143;
+                outline: 0;
+            }
+            .form-control:focus {
+              border-color: #1ab394 !important;
+            }
+            .btn-primary:hover,
+            .btn-primary:focus {
+              background-color: #18a689;
+              border-color: #18a689;
+              color: #FFFFFF;
+            }
+            body.mini-navbar.fixed-sidebar .profile-element, .block {
+                display: block !important;
+            }
+            .m-b {
+                margin-bottom: 15px;
+            }
+            .full-width {
+                width: 100% !important;
+            }
+            .block {
+                display: block;
+            }
+            .btn {
+                padding: 6px 12px;
+                font-size: 14px;
+                font-weight: 400;
+                line-height: 1.42857143;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: middle;
+                touch-action: manipulation;
+                cursor: pointer;
+                background-image: none;
+                border: 1px solid transparent;
+                border-radius: 3px;
+                display: block;
+            }
+            .btn-primary {
+                background-color: #1ab394;
+                border-color: #1ab394;
+                color: #FFFFFF;
+            }
+            .logo {
+                font-size: 34pt;
+                font-family: sans-serif;
+                color: #18a689;
+            }
+            .text-navy {
+                color: #1ab394;
+            }
+            .ibox-content {
+                background-color: #ffffff;
+                border-color: #e7eaec;
+                border-image: none;
+                border-style: solid solid none;
+                border-width: 1px 0px;
+                margin: 10px 0;
+                padding: 5px;
+                color: #676a6c;
+            }
+            .no-margins {
+                margin: 0 !important;
+            }
+
+            table {
+                border-spacing: 0;
+                border-collapse: collapse;
+                background-color: transparent;
+            }
+
+            th, td {
+                border-top: 1px solid #e7eaec;
+                line-height: 1.42857;
+                padding: 8px;
+                vertical-align: middle;
+            }
+            .table>thead:first-child>tr:first-child>td, .table>thead:first-child>tr:first-child>th {
+                border-top: 0;
+            }
+            th {
+                text-align: left;
+                border-bottom: 1px solid #DDDDDD;
+                vertical-align: bottom;
+            }
+        </style>
+        <script type="text/javascript">
+            function post(url, data, callback) {
+                var http = new XMLHttpRequest();
+                http.onreadystatechange = function() {
+                    if (this.readyState == 4 && callback)
+                        callback(this.responseText);
+                };
+                http.open('POST', url, true);
+                http.timeout = 60000;
+                http.send(data);
+            }
+            function save() {
+                var ssid = document.getElementById('ssid').value;
+                var pass = document.getElementById('password').value;
+                
+                post('/save', 'ssid=' + encodeURIComponent(ssid) + '&password=' + encodeURIComponent(pass), function(resp) {
+                    alert('Saved ' + resp); // Todo: make this pretty
+                    window.close();
+                });
+            }
+        </script>
+    </head>
+    <body>
+        <div class="middle-box">
+            <div>
+                <div class="logo">SmartBnbKit</div>
+                <p style="margin-top: -5px;">WiFi configuration</p>
+                
+                <div class="ibox-content">
+                    <table class="table table-hover no-margins full-width">
+                        <thead>
+                        <tr>
+                            <th>SSID</th>
+                            <th>Signal strength</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        %scan_results%
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Please enter your WiFi credentials</h3>
+                <form class="m-t" method="post">
+                    <div class="form-group"><input type="text" class="form-control" placeholder="SSID" required name="ssid" id="ssid" value="%ssid%"></div>
+                    <div class="form-group"><input type="password" class="form-control" placeholder="Password" id="password" value="%pass%"> </div>
+                    <button onclick="save()" class="btn btn-primary block full-width m-b">Save and reboot</button>
+                </form>
+                <p class="m-t"> <small>Toptal © 2016</small> </p>
+            </div>
+        </div>
+    </body>
+</html>)RES";
+const char Resource_WiFiIcon[] PROGMEM = R"RES(<svg width="14" height="14" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M896 1523q-20 0-93-73.5t-73-93.5q0-32 62.5-54t103.5-22 103.5 22 62.5 54q0 20-73 93.5t-93 73.5zm270-271q-2 0-40-25t-101.5-50-128.5-25-128.5 25-101 50-40.5 25q-18 0-93.5-75t-75.5-93q0-13 10-23 78-77 196-121t233-44 233 44 196 121q10 10 10 23 0 18-75.5 93t-93.5 75zm273-272q-11 0-23-8-136-105-252-154.5t-268-49.5q-85 0-170.5 22t-149 53-113.5 62-79 53-31 22q-17 0-92-75t-75-93q0-12 10-22 132-132 320-205t380-73 380 73 320 205q10 10 10 22 0 18-75 93t-92 75zm271-271q-11 0-22-9-179-157-371.5-236.5t-420.5-79.5-420.5 79.5-371.5 236.5q-11 9-22 9-17 0-92.5-75t-75.5-93q0-13 10-23 187-186 445-288t527-102 527 102 445 288q10 10 10 23 0 18-75.5 93t-92.5 75z" fill="#1ab394" /></svg>)RES";
+const char Resource_LockIcon[] PROGMEM = R"RES(<svg width="14" height="14" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M640 768h512v-192q0-106-75-181t-181-75-181 75-75 181v192zm832 96v576q0 40-28 68t-68 28h-960q-40 0-68-28t-28-68v-576q0-40 28-68t68-28h32v-192q0-184 132-316t316-132 316 132 132 316v192h32q40 0 68 28t28 68z" fill="#000"/></svg>)RES";
+const char Resource_NetworkRow[] PROGMEM = R"RES(<tr onclick="document.getElementById('ssid').value = this.getElementsByTagName('td')[0].getElementsByTagName('span')[0].innerHTML" style="cursor: pointer;">
+                                                    <td style="position: relative"><div style="position: absolute; left: 3px;">%fa-lock%</div><span>%ssid%</span></td>
+                                                    <td class="text-navy">%fa-wifi% %strength%%</td>
+                                                </tr>)RES";
