@@ -1,3 +1,6 @@
+#ifndef CONFIGURATION_HPP
+#define CONFIGURATION_HPP
+
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
@@ -10,7 +13,7 @@ class Configuration {
 public:
     Configuration() { }
     bool begin(const char *ssid, const char *pass = nullptr) {
-        WiFi.mode(WIFI_AP_STA);
+        WiFi.mode(WIFI_AP);
 
         if (pass) WiFi.softAP(ssid, pass);
         else      WiFi.softAP(ssid);
@@ -57,7 +60,7 @@ public:
             m_http.send(200, "text/plain", "OK, SSID: " + ssid + ", Pass: " + pass);
             
             delay(2000);
-            ESP.reset();
+            ESP.restart();
         });
         m_http.onNotFound([this] {
             if (captivePortal()) 
@@ -104,3 +107,5 @@ private:
         return true;
     }
 };
+
+#endif
