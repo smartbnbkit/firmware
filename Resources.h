@@ -156,8 +156,13 @@ const char Resource_Index[] PROGMEM = R"RES(<!DOCTYPE html>
             function save() {
                 var ssid = document.getElementById('ssid').value;
                 var pass = document.getElementById('password').value;
+                var api_login = document.getElementById('api_login').value;
+                var api_pass = document.getElementById('api_pass').value;
                 
-                post('/save', 'ssid=' + encodeURIComponent(ssid) + '&password=' + encodeURIComponent(pass), function(resp) {
+                post('/save', 'ssid=' + encodeURIComponent(ssid) +
+                              '&password=' + encodeURIComponent(pass) +
+                              '&api_login=' + encodeURIComponent(api_login) +
+                              '&api_pass=' + encodeURIComponent(api_pass), function(resp) {
                     alert('Saved ' + resp); // Todo: make this pretty
                     window.close();
                 });
@@ -208,6 +213,9 @@ const char Resource_Index[] PROGMEM = R"RES(<!DOCTYPE html>
                 <form class="m-t" method="post">
                     <div class="form-group"><input type="text" class="form-control" placeholder="SSID" required name="ssid" id="ssid" value="%ssid%"></div>
                     <div class="form-group"><input type="password" class="form-control" placeholder="Password" id="password" value="%pass%"> </div>
+                    <h3>Your API credentials:</h3>
+                    <div class="form-group"><input type="text" class="form-control" placeholder="API username" required id="api_login" value="%api_login%"></div>
+                    <div class="form-group"><input type="password" class="form-control" placeholder="API password" required id="api_pass" value="%api_pass%"> </div>
                     <button onclick="save()" class="btn btn-primary block full-width m-b">Save and reboot</button>
                 </form>
                 <p class="m-t"> <small>Toptal © 2016</small> </p>

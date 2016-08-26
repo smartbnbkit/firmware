@@ -1,11 +1,15 @@
 #include <Schedule.h>
 #include <ESP8266HTTPClient.h>
+#include <ESP8266httpUpdate.h>
 #include "Configuration.hpp"
 #include "Input.hpp"
 #include "Utils.hpp"
 
 Configuration config;
 Input input;
+
+const auto FirmwareVersion = 3;
+const auto MotionTimeout = 5; // minutes
 
 enum Pins {
     Door     = 4,
@@ -20,7 +24,6 @@ os_timer_t DoorTimer;
 os_timer_t MotionTimer;
 
 bool IsSomeoneInside = false;
-bool waitForMotionEnd = false;
 
 void changeState(bool on) {
     IsSomeoneInside = on;
@@ -54,6 +57,17 @@ void setup() {
         }
         Serial.printf("\nWiFi connected. IP: ");
         Serial.println(WiFi.localIP());
+        
+        // https://github.com/esp8266/Arduino/tree/master/doc/ota_updates#advanced-updater-1
+        ESPhttpUpdate.update("http://192.168.241.148:12345/update", String(FirmwareVersion));
+        
+        // Login to api
+        String apiLogin(config.getApiUsername());
+        if (apiLogin) {
+            HTTPClient http;
+            http.begin("http://" + apiLogin + ":" + String(config.getApiPassword()) + "@192.168.241.148:12345/api/login");
+            http.GET();
+        }
     } else {
         config.begin("SmartBnbKit", "gotoptal");
     }
@@ -66,29 +80,30 @@ void loop() {
         // If there is nothing against the sensor, that means the doors are closed
         // If motion sensor is on, that means there was somebody inside, so he must just leave
         if (!on && digitalRead(Pins::Motion)) {
-            waitForMotionEnd = true;
-        } else {
-            waitForMotionEnd = false;
+            // The motion sensor should turn off after approx 2 seconds if there is no movement whatsoever (meaning everybody left)
+            // If it takes long, that means somebody is still inside
+            startTimer(&DoorTimer, [] {
+                if (!digitalRead(Pins::Motion)) {
+                    changeState(false);
+                }
+            }, 3000, false);
         }
     });
     input.onChanged(Pins::Motion, [] (bool on) {
-        on = !on; // Get the proper logic state
+        on = !on; // Get proper logic state
         
         digitalWrite(Pins::GreenLED, !on);
         
         // We've got a move - someone is inside
         if (on) {
             changeState(true);
-            waitForMotionEnd = false;
-        } else if (waitForMotionEnd) {
-            changeState(false);
         }
         
         // If there is no movement for 5 minutes
         // Note: This timeout will be reset after each PIR detection
         startTimer(&MotionTimer, [] {
             changeState(false);
-        }, 5 * 60 * 1000, false);
+        }, MotionTimeout * 60 * 1000, false);
     });
     
     // Config mode after holding button for at least 2 seconds
